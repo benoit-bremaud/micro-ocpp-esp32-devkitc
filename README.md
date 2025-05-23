@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# micro-ocpp-esp32-devkitc
-Micro-OCPP ESP32 module for OCPP 1.6J compliance testing with VEV-IQ supervision backend.
-=======
 # Micro-OCPP ESP32 DevKitC
 
 > Internal VEV project — OCPP 1.6J integration on ESP32 for EV charger gateway simulation.
@@ -100,4 +96,3 @@ You should see:
 This project is part of the VEV Platform Services France R\&D environment and is not intended for public redistribution.
 
 All rights reserved.
->>>>>>> 184c62e (Add initial project structure with configuration and documentation)
