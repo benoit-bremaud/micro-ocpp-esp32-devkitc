@@ -34,43 +34,47 @@ It runs [Micro-OCPP](https://github.com/matth-x/MicroOcpp) and simulates an EVSE
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/<your-org>/micro-ocpp-esp32-devkitc.git
+git clone git@github.com:benoit-bremaud/micro-ocpp-esp32-devkitc.git
 cd micro-ocpp-esp32-devkitc
 code .
+```plaintext
+
+### 2. Initialize PlatformIO project (if not already done)
+
+* Open the VS Code command palette (`⇧⌘P` or `Ctrl+Shift+P`)
+* Run `PlatformIO: Initialize Project`
+* Select `DOIT ESP32 DEVKIT V1` board and `Arduino` framework
+* Make sure the project initializes in the root directory
+
+### 3. Create your local configuration file
+
+```bash
+cp include/env.example.h include/env.h
 ```
 
-### 2. Initialize PlatformIO
-
-In VS Code:
-
-* Open the command palette (⇧⌘P / Ctrl+Shift+P)
-* Select `PlatformIO: Initialize Project`
-* Board: `DOIT ESP32 DEVKIT V1`
-* Framework: `Arduino`
-* Ensure it uses the current folder (no nested sub-folder)
-
-### 3. Configure Wi-Fi credentials
-
-Edit `src/main.cpp`:
+Then edit `include/env.h` with your credentials:
 
 ```cpp
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+#define WIFI_SSID        "YourSSID"
+#define WIFI_PASSWORD    "YourPassword"
+#define OCPP_ENDPOINT    "wss://your-csms-url.com/ocpp"
+#define CHARGE_BOX_ID    "your-charge-box-id"
 ```
 
-### 4. Build and upload the firmware
+### 4. Build, Upload and Monitor
 
-Use the PlatformIO toolbar:
+Use the PlatformIO toolbar or commands:
 
 * ✅ Build
 * ⬆️ Upload
 * 🔍 Monitor (to view serial output)
 
-You should see:
+Expected serial output:
 
 ```text
+[BOOT] Connecting to Wi-Fi...
 ✅ Wi-Fi connected
-📡 IP address: 192.168.x.x
+📡 IP Address: 192.168.x.x
 ```
 
 ---
@@ -78,15 +82,29 @@ You should see:
 ## 📁 Project Structure
 
 ```text
-├── src/               # Main firmware code
-├── lib/               # External libraries (e.g., MicroOCPP)
-├── include/           # Custom headers (optional)
-├── test/              # Unit tests
-├── .pio/              # PlatformIO build system
-├── platformio.ini     # Project configuration
-├── README.md          # This file
-├── .gitignore         # Ignored files
+├── src/                 # Main firmware code (main.cpp)
+├── lib/                 # External libraries (e.g., MicroOCPP)
+├── include/             # Custom headers (env.h, config.h)
+│   ├── env.h            # Local (not versioned)
+│   └── config.h         # Shared definitions
+├── test/                # Unit tests
+├── .pio/                # PlatformIO build system
+├── platformio.ini       # Project configuration
+├── .gitignore           # Ignored files and folders
+├── README.md            # This file
 ```
+
+---
+
+## 🔐 Configuration Management
+
+This project uses external configuration files to separate secrets:
+
+* `include/env.h` → **NOT versioned**, contains Wi-Fi, OCPP credentials
+* `include/env.example.h` → **versioned**, template for credentials
+* `include/config.h` → Versioned, shared build-time configuration
+
+📌 Copy `include/env.example.h` to `include/env.h` and fill in your parameters before flashing.
 
 ---
 

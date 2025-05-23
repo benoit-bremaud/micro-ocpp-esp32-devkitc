@@ -1,58 +1,4 @@
-<<<<<<< HEAD
-# Prerequisites
-*.d
-
-# Object files
-*.o
-*.ko
-*.obj
-*.elf
-
-# Linker output
-*.ilk
-*.map
-*.exp
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
-
-# Debug files
-*.dSYM/
-*.su
-*.idb
-*.pdb
-
-# Kernel Module Compile Results
-*.mod*
-*.cmd
-.tmp_versions/
-modules.order
-Module.symvers
-Mkfile.old
-dkms.conf
-=======
-# PlatformIO build and config
+# PlatformIO build and config directories
 .pio/
 .platformio/
 
@@ -66,11 +12,11 @@ dkms.conf
 Thumbs.db
 ehthumbs.db
 
-# Python
+# Python artifacts
 *.pyc
 __pycache__/
 
-# Backup / swap / temp files
+# Backup / temp / swap files
 *.bak
 *.tmp
 *.swp
@@ -78,7 +24,7 @@ __pycache__/
 *.orig
 *.old
 
-# Arduino-related
+# Arduino & ESP32 build artifacts
 *.bin
 *.elf
 *.hex
@@ -87,11 +33,15 @@ __pycache__/
 spiffs.bin
 data/.generated.index
 
-# Project-specific ignores
+# PlatformIO-specific backups
 platformio.ini.bak
-test/.pio/
 
-# Misc
+# Library cache (optional)
 lib_deps/
 build/
->>>>>>> 184c62e (Add initial project structure with configuration and documentation)
+
+# Test build cache
+test/.pio/
+
+# Private config files (local only)
+include/env.h
