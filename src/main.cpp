@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <MicroOcpp.h>
 #include "config.h"
+#include "bootnotification_handler.h"
 
 void connectToWiFi() {
   Serial.print("[Wi-Fi] Connecting to ");
@@ -30,12 +31,18 @@ void setup() {
   delay(1000);
 
   Serial.println("[BOOT] Starting ESP32...");
+
+  // -- Wi-Fi connection --
   connectToWiFi();
+
+  // -- BootNotification parameter configuration --
+  setupBootNotification();
 
   // -- API Arduino MicroOcpp --
   mocpp_initialize(OCPP_ENDPOINT, CHARGE_BOX_ID);
 }
 
 void loop() {
+  // Main MicroOcpp loop
   mocpp_loop();
 }
