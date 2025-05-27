@@ -16,7 +16,7 @@ When creating a new issue in GitHub:
    - Summary
    - Objective
    - Steps
-   - Related Docs
+   - Related Docs / Links
    - Tags
 
 ## Naming Conventions

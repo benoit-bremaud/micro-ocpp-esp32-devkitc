@@ -1,7 +1,7 @@
 ---
 name: OCPP Task
 about: Standard template for documenting and tracking tasks for OCPP-related features
-title: "[P_] <task title>"
+title: "[P_XX] <task title>"
 labels: [ocpp, esp32]
 assignees: []
 ---
