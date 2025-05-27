@@ -1,80 +1,86 @@
 # Micro-OCPP ESP32 DevKitC
 
-> Internal VEV project — OCPP 1.6J integration on ESP32 for EV charger gateway simulation.
+> Internal R\&D Project – VEV Platform Services France
+> OCPP 1.6J integration on ESP32 for EVSE gateway simulation
 
-This repository contains a PlatformIO-based firmware project for an ESP32-WROOM-32D module.
-It runs [Micro-OCPP](https://github.com/matth-x/MicroOcpp) and simulates an EVSE speaking OCPP 1.6J, designed to interact with the VEV-IQ backend.
+This repository contains a firmware project based on PlatformIO for the ESP32-WROOM-32D module. It integrates the [Micro-OCPP](https://github.com/matth-x/MicroOcpp) library to emulate a basic OCPP 1.6J EVSE, capable of connecting to an OCPP backend such as **VEV-IQ**.
 
 ---
 
 ## 📦 Features
 
 * ESP32-WROOM-32D (DOIT DevKitC)
-* Wi-Fi connection and WebSocket client
-* OCPP 1.6J message support (BootNotification, Authorize, TxStart/Stop, etc.)
+* Wi-Fi connection with WebSocket client
+* OCPP 1.6J message support:
+
+  * `BootNotification`
+  * `Authorize`
+  * `StartTransaction`
+  * `StopTransaction`
+  * `MeterValues`
+  * (optional) `Heartbeat`, `DiagnosticsStatusNotification`, `FirmwareStatusNotification`
 * TLS-ready configuration (optional)
-* Modular design for testing relays, RFID, LEDs, etc.
-* Fully integrated into the VEV-Gateway project architecture
+* Modular hardware abstraction for relays, RFID, LEDs, etc.
+* Fully integrated with the **VEV-Gateway** project stack
 
 ---
 
 ## 🧰 Requirements
 
-| Component   | Version / Note                |
+| Component   | Details                       |
 | ----------- | ----------------------------- |
-| ESP32 board | DOIT ESP32 DEVKIT V1          |
+| ESP32 Board | DOIT ESP32 DEVKIT V1          |
 | Framework   | PlatformIO + Arduino          |
-| Toolchain   | VS Code + PlatformIO IDE      |
+| Toolchain   | Visual Studio Code + PIO IDE  |
 | Backend     | VEV-IQ (OCPP 1.6J compatible) |
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
 git clone git@github.com:benoit-bremaud/micro-ocpp-esp32-devkitc.git
 cd micro-ocpp-esp32-devkitc
 code .
-```plaintext
+```
 
-### 2. Initialize PlatformIO project (if not already done)
+### 2. Initialize PlatformIO Project (if needed)
 
-* Open the VS Code command palette (`⇧⌘P` or `Ctrl+Shift+P`)
+* Open VS Code Command Palette (`⇧⌘P` or `Ctrl+Shift+P`)
 * Run `PlatformIO: Initialize Project`
-* Select `DOIT ESP32 DEVKIT V1` board and `Arduino` framework
-* Make sure the project initializes in the root directory
+* Select `DOIT ESP32 DEVKIT V1` and Arduino framework
 
-### 3. Create your local configuration file
+### 3. Configure Your Local Environment
 
 ```bash
 cp include/env.example.h include/env.h
 ```
 
-Then edit `include/env.h` with your credentials:
+Edit `include/env.h`:
 
 ```cpp
 #define WIFI_SSID        "YourSSID"
 #define WIFI_PASSWORD    "YourPassword"
-#define OCPP_ENDPOINT    "wss://your-csms-url.com/ocpp"
+#define OCPP_ENDPOINT    "wss://your-csms-url/ocpp"
 #define CHARGE_BOX_ID    "your-charge-box-id"
 ```
 
-### 4. Build, Upload and Monitor
+### 4. Build, Upload, Monitor
 
-Use the PlatformIO toolbar or commands:
+Use the PlatformIO interface or CLI:
 
 * ✅ Build
 * ⬆️ Upload
-* 🔍 Monitor (to view serial output)
+* 🔍 Monitor (serial log output)
 
-Expected serial output:
+Expected output:
 
 ```text
 [BOOT] Connecting to Wi-Fi...
 ✅ Wi-Fi connected
-📡 IP Address: 192.168.x.x
+📡 IP Address: 192.168.X.X
 ```
 
 ---
@@ -82,35 +88,33 @@ Expected serial output:
 ## 📁 Project Structure
 
 ```text
-├── src/                 # Main firmware code (main.cpp)
+├── src/                 # Main application code
 ├── lib/                 # External libraries (e.g., MicroOCPP)
-├── include/             # Custom headers (env.h, config.h)
-│   ├── env.h            # Local (not versioned)
+├── include/             # Custom headers and configuration
+│   ├── env.h            # Local secrets (excluded from Git)
+│   ├── env.example.h    # Template for `env.h`
 │   └── config.h         # Shared definitions
-├── test/                # Unit tests
-├── .pio/                # PlatformIO build system
-├── platformio.ini       # Project configuration
-├── .gitignore           # Ignored files and folders
-├── README.md            # This file
+├── test/                # Unit test files
+├── platformio.ini       # PlatformIO configuration
+├── .gitignore           # Git ignore rules
+├── README.md            # Project overview (this file)
 ```
 
 ---
 
 ## 🔐 Configuration Management
 
-This project uses external configuration files to separate secrets:
+This project uses structured configuration layering:
 
-* `include/env.h` → **NOT versioned**, contains Wi-Fi, OCPP credentials
-* `include/env.example.h` → **versioned**, template for credentials
-* `include/config.h` → Versioned, shared build-time configuration
-
-📌 Copy `include/env.example.h` to `include/env.h` and fill in your parameters before flashing.
+* `include/env.h`: Not committed – contains sensitive credentials
+* `include/env.example.h`: Versioned template – for sharing default structure
+* `include/config.h`: Shared and versioned configuration for internal logic
 
 ---
 
-## 🔒 License
+## ⚠️ License
 
-**Internal use only.**
-This project is part of the VEV Platform Services France R\&D environment and is not intended for public redistribution.
+**Internal Use Only – VEV Platform Services France**
+This project is intended solely for development within the VEV-Gateway initiative. Redistribution or public deployment is not permitted without explicit authorization.
 
 All rights reserved.
