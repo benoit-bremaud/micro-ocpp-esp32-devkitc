@@ -118,6 +118,18 @@ See [PROJECT_PLAN.md](./PROJECT_PLAN.md) for the complete roadmap, milestones, a
 
 ---
 
+## Governance & Access Policy
+
+This repository enforces a strict security and access control policy to ensure consistency and traceability.
+
+* The `main` branch is protected: all changes must go through pull requests
+* CI workflows are restricted to specific trusted GitHub Actions (`checkout`, `setup-python`, `cache`)
+* First-time contributors must be approved before workflows run
+* Secrets are excluded and managed outside the repository (`env.h` is ignored)
+* A full breakdown of security decisions is available in [SECURITY.md](./SECURITY.md)
+
+---
+
 ## ⚠️ License
 
 **Internal Use Only – VEV Platform Services France**
