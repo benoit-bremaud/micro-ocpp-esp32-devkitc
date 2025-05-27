@@ -83,7 +83,7 @@ The following measures may be considered to further improve repository security 
 If you believe you’ve found a security vulnerability in this project:
 
 1. Do not open a GitHub issue or PR.
-2. Contact the maintainers privately (contact info to be added here if applicable).
+2. Contact the maintainers privately at: <benoit.bremaud@vev.com>
 
 ---
 
