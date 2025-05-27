@@ -39,4 +39,4 @@ jobs:
 
       - name: Run PlatformIO Build
         run: |
-          platformio run -e esp32dev -D CI_BUILD=1
+          platformio run
