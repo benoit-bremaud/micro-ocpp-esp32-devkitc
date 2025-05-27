@@ -112,6 +112,12 @@ This project uses structured configuration layering:
 
 ---
 
+## 📌 Project Plan
+
+See [PROJECT_PLAN.md](./PROJECT_PLAN.md) for the complete roadmap, milestones, and issue conventions.
+
+---
+
 ## ⚠️ License
 
 **Internal Use Only – VEV Platform Services France**
@@ -123,7 +129,7 @@ All rights reserved.
 
 ## 👤 Maintainer
 
-This repository is maintained by the R\&D team at **VEV Platform Services France**.
+This repository is maintained by the R&D team at **VEV Platform Services France**.
 For internal questions or contributions, contact: **\[Firstname Lastname]** (VEV Technical Team)
 
 > External contributions are currently not accepted. This is a private repository.
