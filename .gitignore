@@ -34,3 +34,7 @@ include/env.h
 
 # Ignored libraries
 lib_ignore
+
+# Ignored structure text files
+*_structure.txt
+
