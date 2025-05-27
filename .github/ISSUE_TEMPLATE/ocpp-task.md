@@ -1,7 +1,7 @@
 ---
 name: OCPP Task
 about: Standard template for documenting and tracking tasks for OCPP-related features
-title: "[P_XX] <task title>"
+title: "[P_<issue number>] <task title>" # e.g. [P_07] Handle BootNotification
 labels: [ocpp, esp32]
 assignees: []
 ---

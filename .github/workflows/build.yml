@@ -17,6 +17,14 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-platformio
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install PlatformIO
         run: |
           python -m pip install --upgrade pip
@@ -24,4 +32,4 @@ jobs:
 
       - name: Run PlatformIO Build
         run: |
-          platformio run
+          platformio run -e esp32dev -D CI_BUILD=1
