@@ -24,7 +24,7 @@ This repository contains a firmware project based on PlatformIO for the ESP32-WR
 * Fully integrated with the **VEV-Gateway** project stack
 
 ---
-
+V
 ## 🧰 Requirements
 
 | Component   | Details                       |
