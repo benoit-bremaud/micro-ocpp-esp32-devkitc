@@ -87,4 +87,6 @@ If you believe you’ve found a security vulnerability in this project:
 
 ---
 
-Last updated: 2025-05-27 Maintainer: Benoît Bremaud
+Last updated: 2025-05-27  
+Maintainer: Benoît Bremaud
+
