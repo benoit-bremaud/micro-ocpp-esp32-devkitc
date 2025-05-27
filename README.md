@@ -118,3 +118,12 @@ This project uses structured configuration layering:
 This project is intended solely for development within the VEV-Gateway initiative. Redistribution or public deployment is not permitted without explicit authorization.
 
 All rights reserved.
+
+---
+
+## 👤 Maintainer
+
+This repository is maintained by the R\&D team at **VEV Platform Services France**.
+For internal questions or contributions, contact: **\[Firstname Lastname]** (VEV Technical Team)
+
+> External contributions are currently not accepted. This is a private repository.
