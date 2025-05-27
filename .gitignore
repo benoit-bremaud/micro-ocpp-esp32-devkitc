@@ -1,47 +1,36 @@
-# PlatformIO build and config directories
+# PlatformIO build folders
 .pio/
-.platformio/
+.pioenvs/
+.piolibdeps/
+.compile
 
-# IDE & tooling
-.vscode/
+# IDE configuration
 .idea/
-*.code-workspace
+.vscode/
+.gcc-flags.json
+.clang_complete
+
+# Test and debug artifacts
+*.elf
+*.bin
+*.hex
+*.map
+*.pyc
+__pycache__/
 
 # OS-specific files
 .DS_Store
 Thumbs.db
-ehthumbs.db
 
-# Python artifacts
-*.pyc
-__pycache__/
-
-# Backup / temp / swap files
+# File backups and swap
 *.bak
-*.tmp
 *.swp
 *.swo
 *.orig
-*.old
 
-# Arduino & ESP32 build artifacts
-*.bin
-*.elf
-*.hex
-
-# SPIFFS / FS builds
-spiffs.bin
-data/.generated.index
-
-# PlatformIO-specific backups
-platformio.ini.bak
-
-# Library cache (optional)
-lib_deps/
-build/
-
-# Test build cache
-test/.pio/
-
-# Private config files (local only)
+# Secrets and environment files
+.env
 include/env.h
+
+# Ignored libraries
+lib_ignore
