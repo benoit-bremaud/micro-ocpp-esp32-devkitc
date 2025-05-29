@@ -1,0 +1,11 @@
+{
+  "chargePointVendor": "VEV",
+  "chargePointModel": "VEV-Gateway-ESP32",
+  "chargeBoxSerialNumber": "GW001",
+  "chargePointSerialNumber": "GW001-CP",
+  "firmwareVersion": "v1.0.0",
+  "iccid": "8944123456789012345",
+  "imsi": "208101234567890",
+  "meterSerialNumber": "MTR001",
+  "meterType": "MID"
+}
