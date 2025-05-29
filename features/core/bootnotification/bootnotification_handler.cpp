@@ -1,12 +1,21 @@
 #include "bootnotification_handler.h"
 #include <MicroOcpp.h>
+#include <ArduinoJson.h>
+#include <Arduino.h>
 
-// Set BootNotification parameters before connecting to the CSMS
+// Callback for BootNotification.conf
+void onBootNotificationConf(JsonObject response) {
+    const char* status = response["status"];
+    const char* currentTime = response["currentTime"];
+    int interval = response["interval"];
+
+    Serial.printf("[BootNotification.conf] Status: %s | Time: %s | HeartbeatInterval: %d\n",
+                  status, currentTime, interval);
+
+    // TODO: Add business logic here based on status, e.g.:
+    // if (strcmp(status, "Accepted") == 0) { ... }
+    // else if (strcmp(status, "Rejected") == 0) { ... }
+}
 void setupBootNotification() {
-    setChargePointVendor("VEV");
-    setChargePointModel("VEV-Gateway-ESP32");
-    setChargeBoxSerialNumber("GW001");
-    setFirmwareVersion("v1.0.0");
-    // Add other parameters as needed (ICCID, IMSI, etc.)
-    // No manual trigger: MicroOcpp sends BootNotification automatically on connection
+
 }

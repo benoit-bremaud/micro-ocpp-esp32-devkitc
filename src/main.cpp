@@ -2,7 +2,8 @@
 #include <WiFi.h>
 #include <MicroOcpp.h>
 #include "config.h"
-#include "bootnotification_handler.h"
+#include "../features/core/bootnotification/bootnotification_handler.h"
+#include "env.h"
 
 void connectToWiFi() {
   Serial.print("[Wi-Fi] Connecting to ");
@@ -35,11 +36,12 @@ void setup() {
   // -- Wi-Fi connection --
   connectToWiFi();
 
+    // -- API Arduino MicroOcpp --
+  mocpp_initialize(OCPP_ENDPOINT, CHARGE_BOX_ID);
+
   // -- BootNotification parameter configuration --
   setupBootNotification();
 
-  // -- API Arduino MicroOcpp --
-  mocpp_initialize(OCPP_ENDPOINT, CHARGE_BOX_ID);
 }
 
 void loop() {
