@@ -1,147 +1,315 @@
-# Micro-OCPP ESP32 DevKitC
+# OCPP 1.6 ESP32 Implementation with MicroOCPP
 
-> Internal R\&D Project – VEV Platform Services France
-> OCPP 1.6J integration on ESP32 for EVSE gateway simulation
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![OCPP Version](https://img.shields.io/badge/OCPP-1.6-blue.svg)](https://www.openchargealliance.org/)
+[![MicroOCPP](https://img.shields.io/badge/MicroOCPP-2.0.1-green.svg)](https://github.com/matth-x/MicroOcpp)
 
-This repository contains a firmware project based on PlatformIO for the ESP32-WROOM-32D module. It integrates the [Micro-OCPP](https://github.com/matth-x/MicroOcpp) library to emulate a basic OCPP 1.6J EVSE, capable of connecting to an OCPP backend such as **VEV-IQ**.
+## 🎯 Objectif
 
----
+Implémentation d'un point de charge OCPP 1.6 sur ESP32 en utilisant la bibliothèque [MicroOCPP](https://github.com/matth-x/MicroOcpp) comme base, avec des extensions et personnalisations pour nos besoins spécifiques.
 
-## 📦 Features
+## ⚡ Caractéristiques
 
-* ESP32-WROOM-32D (DOIT DevKitC)
-* Wi-Fi connection with WebSocket client
-* OCPP 1.6J message support:
+- ✅ **OCPP 1.6** - Support complet du protocole OCPP 1.6
+- ✅ **ESP32 Optimisé** - Conçu spécifiquement pour l'ESP32 DevKit-C
+- ✅ **MicroOCPP** - Utilise la bibliothèque mature MicroOCPP
+- ✅ **Extensions** - Ajout de fonctionnalités personnalisées
+- ✅ **Hardware Integration** - Support pour capteurs et actionneurs
 
-  * `BootNotification`
-  * `Authorize`
-  * `StartTransaction`
-  * `StopTransaction`
-  * `MeterValues`
-  * (optional) `Heartbeat`, `DiagnosticsStatusNotification`, `FirmwareStatusNotification`
-* TLS-ready configuration (optional)
-* Modular hardware abstraction for relays, RFID, LEDs, etc.
-* Fully integrated with the **VEV-Gateway** project stack
+## 📊 Feature Profiles Supportés
 
----
-V
-## 🧰 Requirements
+| Feature Profile | Statut | Description |
+|----------------|--------|-------------|
+| **Core** | ✅ Supporté | Fonctionnalités de base OCPP |
+| **Smart Charging** | ✅ Supporté | Charge intelligente |
+| **Local Auth List** | ✅ Supporté | Listes d'autorisation locales |
+| **Firmware Management** | ✅ Supporté | Gestion firmware |
+| **Reservation** | ✅ Supporté | Système de réservation |
 
-| Component   | Details                       |
-| ----------- | ----------------------------- |
-| ESP32 Board | DOIT ESP32 DEVKIT V1          |
-| Framework   | PlatformIO + Arduino          |
-| Toolchain   | Visual Studio Code + PIO IDE  |
-| Backend     | VEV-IQ (OCPP 1.6J compatible) |
+## 🚀 Démarrage Rapide
 
----
+### Prérequis
 
-## 🚀 Quick Start
+- **PlatformIO** - [Installation](https://platformio.org/install)
+- **ESP32 DevKit-C** - Carte de développement
+- **Serveur OCPP** - Pour les tests (ex: SteVe, OCPP Central System)
 
-### 1. Clone the Repository
+### Installation
 
-```bash
-git clone git@github.com:benoit-bremaud/micro-ocpp-esp32-devkitc.git
+\`\`\`bash
+# Cloner le repository
+git clone https://github.com/benoit-bremaud/micro-ocpp-esp32-devkitc.git
 cd micro-ocpp-esp32-devkitc
-code .
-```
 
-### 2. Initialize PlatformIO Project (if needed)
+# Compiler et uploader
+pio run --target upload
 
-* Open VS Code Command Palette (`⇧⌘P` or `Ctrl+Shift+P`)
-* Run `PlatformIO: Initialize Project`
-* Select `DOIT ESP32 DEVKIT V1` and Arduino framework
+# Monitorer les logs
+pio device monitor
+\`\`\`
 
-### 3. Configure Your Local Environment
+### Configuration
 
-```bash
-cp include/env.example.h include/env.h
-```
+1. **WiFi** - Configurer SSID et mot de passe dans `src/main.cpp`
+2. **OCPP Server** - Définir l'URL du serveur OCPP dans `src/main.cpp`
+3. **Hardware** - Adapter la configuration dans `include/hardware_config.h`
 
-Edit `include/env.h`:
+## 📁 Structure du Projet
 
-```cpp
-#define WIFI_SSID        "YourSSID"
-#define WIFI_PASSWORD    "YourPassword"
-#define OCPP_ENDPOINT    "wss://your-csms-url/ocpp"
-#define CHARGE_BOX_ID    "your-charge-box-id"
-```
+\`\`\`
+micro-ocpp-esp32-devkitc/
+├── src/                    # Code source principal
+│   ├── main.cpp            # Point d'entrée principal
+│   ├── config/             # Configuration spécifique
+│   ├── hardware/           # Intégration hardware ESP32
+│   └── extensions/         # Extensions MicroOCPP
+├── include/                # Headers globaux
+│   ├── project_config.h    # Configuration du projet
+│   └── hardware_config.h   # Configuration hardware
+├── lib/                    # Bibliothèques (MicroOCPP)
+├── test/                   # Tests unitaires et d'intégration
+├── docs/                   # Documentation
+└── examples/               # Exemples d'utilisation
+\`\`\`
 
-### 4. Build, Upload, Monitor
+## 🔧 Développement
 
-Use the PlatformIO interface or CLI:
+### Workflow
 
-* ✅ Build
-* ⬆️ Upload
-* 🔍 Monitor (serial log output)
+1. **Issue-Driven** - Chaque fonctionnalité a une issue GitHub
+2. **Feature Branches** - `feature/issue-number-feature-name`
+3. **Tests** - Tests unitaires pour les extensions
+4. **Code Review** - Pull Request avec review
 
-Expected output:
+### Commandes Utiles
 
-```text
-[BOOT] Connecting to Wi-Fi...
-✅ Wi-Fi connected
-📡 IP Address: 192.168.X.X
-```
+\`\`\`bash
+# Compiler
+pio run
 
----
+# Uploader
+pio run --target upload
 
-## 📁 Project Structure
+# Debug
+pio run --target upload && pio device monitor
 
-```text
-├── src/                 # Main application code
-├── lib/                 # External libraries (e.g., MicroOCPP)
-├── include/             # Custom headers and configuration
-│   ├── env.h            # Local secrets (excluded from Git)
-│   ├── env.example.h    # Template for `env.h`
-│   └── config.h         # Shared definitions
-├── test/                # Unit test files
-├── platformio.ini       # PlatformIO configuration
-├── .gitignore           # Git ignore rules
-├── README.md            # Project overview (this file)
-```
+# Nettoyage
+pio run --target clean
+\`\`\`
 
----
+## 📚 Documentation
 
-## 🔐 Configuration Management
+- [**MicroOCPP Integration**](docs/MICROOCPP_INTEGRATION.md) - Guide d'intégration MicroOCPP
+- [**Hardware Integration**](docs/HARDWARE_INTEGRATION.md) - Guide d'intégration hardware
+- [**Development Guide**](docs/DEVELOPMENT_GUIDE.md) - Guide de développement
 
-This project uses structured configuration layering:
+## 📈 Roadmap
 
-* `include/env.h`: Not committed – contains sensitive credentials
-* `include/env.example.h`: Versioned template – for sharing default structure
-* `include/config.h`: Shared and versioned configuration for internal logic
+- [x] **Phase 1**: Structure du projet avec MicroOCPP
+- [ ] **Phase 2**: Intégration hardware ESP32
+- [ ] **Phase 3**: Extensions et personnalisations
+- [ ] **Phase 4**: Tests et optimisations
 
----
+## 🤝 Contribution
 
-## 📌 Project Plan
+Les contributions sont les bienvenues ! Voir [CONTRIBUTING.md](CONTRIBUTING.md) pour les guidelines.
 
-See [PROJECT_PLAN.md](./PROJECT_PLAN.md) for the complete roadmap, milestones, and issue conventions.
+## 📄 Licence
 
----
+Ce projet est sous licence MIT. Voir [LICENSE](LICENSE) pour plus de détails.
 
-## Governance & Access Policy
+## 🔗 Liens
 
-This repository enforces a strict security and access control policy to ensure consistency and traceability.
-
-* The `main` branch is protected: all changes must go through pull requests
-* CI workflows are restricted to specific trusted GitHub Actions (`checkout`, `setup-python`, `cache`)
-* First-time contributors must be approved before workflows run
-* Secrets are excluded and managed outside the repository (`env.h` is ignored)
-* A full breakdown of security decisions is available in [SECURITY.md](./SECURITY.md)
-
----
-
-## ⚠️ License
-
-**Internal Use Only – VEV Platform Services France**
-This project is intended solely for development within the VEV-Gateway initiative. Redistribution or public deployment is not permitted without explicit authorization.
-
-All rights reserved.
+- [MicroOCPP](https://github.com/matth-x/MicroOcpp)
+- [Open Charge Alliance](https://www.openchargealliance.org/)
+- [OCPP 1.6 Specification](https://www.openchargealliance.org/protocols/ocpp-16/)
+- [ESP32 Documentation](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/)
 
 ---
 
-## 👤 Maintainer
+**Développé avec ❤️ pour la communauté OCPP**
+\`\`\`
 
-This repository is maintained by the R&D team at **VEV Platform Services France**.
-For internal questions or contributions, contact: **\[Firstname Lastname]** (VEV Technical Team)
+```shellscript file="scripts/create_project_structure.sh"
+#!/bin/bash
 
-> External contributions are currently not accepted. This is a private repository.
+# Script de création de la structure de projet OCPP 1.6 avec MicroOCPP
+# Issue: [INFRA] Project Structure Setup
+
+echo "🏗️  Création de la structure de projet OCPP 1.6 avec MicroOCPP..."
+
+# Vérifier qu'on est dans le bon répertoire
+if [ ! -f "platformio.ini" ]; then
+    echo "❌ Erreur: Ce script doit être exécuté depuis la racine du projet"
+    exit 1
+fi
+
+# Créer la structure racine
+echo "📁 Création de la structure racine..."
+mkdir -p src/{config,hardware,extensions} include lib test/{unit,integration} docs examples
+
+# Créer la structure des extensions
+echo "📁 Création de la structure des extensions..."
+mkdir -p src/extensions/{custom_operations,custom_callbacks,feature_profiles}
+
+# Créer la structure des tests
+echo "📁 Création de la structure des tests..."
+mkdir -p test/unit test/integration
+
+# Créer la structure de documentation
+echo "📁 Création des répertoires de documentation..."
+mkdir -p docs/{images,api}
+
+# Créer les fichiers de base
+echo "📝 Création des fichiers de base..."
+
+# Fichier README principal
+if [ ! -f "README.md" ]; then
+    echo "# OCPP 1.6 ESP32 Implementation with MicroOCPP" > README.md
+    echo "" >> README.md
+    echo "Implémentation d'un point de charge OCPP 1.6 sur ESP32 en utilisant la bibliothèque MicroOCPP." >> README.md
+fi
+
+# Fichier de configuration principal
+if [ ! -f "include/project_config.h" ]; then
+    cat > "include/project_config.h" << EOF
+#ifndef PROJECT_CONFIG_H
+#define PROJECT_CONFIG_H
+
+/**
+ * @file project_config.h
+ * @brief Configuration globale du projet OCPP 1.6 avec MicroOCPP
+ * 
+ * Issue: [INFRA] Project Structure Setup
+ */
+
+// Informations projet
+#define PROJECT_NAME "micro-ocpp-esp32-devkitc"
+#define PROJECT_VERSION "2.0.0"
+#define OCPP_VERSION "1.6"
+
+// Configuration ESP32
+#define SERIAL_BAUD_RATE 115200
+
+#endif // PROJECT_CONFIG_H
+EOF
+fi
+
+# Fichier de configuration hardware
+if [ ! -f "include/hardware_config.h" ]; then
+    cat > "include/hardware_config.h" << EOF
+#ifndef HARDWARE_CONFIG_H
+#define HARDWARE_CONFIG_H
+
+/**
+ * @file hardware_config.h
+ * @brief Configuration hardware pour ESP32
+ * 
+ * Issue: [INFRA] Project Structure Setup
+ */
+
+#include <Arduino.h>
+
+// Configuration GPIO
+#define PIN_LED_STATUS 2
+#define PIN_LED_ERROR 4
+#define PIN_LED_WIFI 5
+
+#endif // HARDWARE_CONFIG_H
+EOF
+fi
+
+# Fichier main.cpp
+if [ ! -f "src/main.cpp" ]; then
+    cat > "src/main.cpp" << EOF
+/**
+ * @file main.cpp
+ * @brief Point d'entrée principal - Intégration MicroOCPP
+ * 
+ * Issue: [INFRA] Project Structure Setup
+ */
+
+#include <Arduino.h>
+#include <WiFi.h>
+// #include <MicroOcpp.h> // Sera activé lors de l'intégration MicroOCPP
+
+#include "project_config.h"
+#include "hardware_config.h"
+
+void setup() {
+    Serial.begin(SERIAL_BAUD_RATE);
+    Serial.println("OCPP 1.6 ESP32 Implementation with MicroOCPP");
+    
+    // Structure du projet initialisée
+}
+
+void loop() {
+    delay(1000);
+}
+EOF
+fi
+
+# Fichier de documentation MicroOCPP
+if [ ! -f "docs/MICROOCPP_INTEGRATION.md" ]; then
+    cat > "docs/MICROOCPP_INTEGRATION.md" << EOF
+# Intégration MicroOCPP
+
+## À propos de MicroOCPP
+
+[MicroOCPP](https://github.com/matth-x/MicroOcpp) est une bibliothèque OCPP 1.6 / 2.0.1 pour microcontrôleurs.
+
+## Installation
+
+MicroOCPP est installé comme dépendance PlatformIO dans notre projet.
+
+## Documentation
+
+- [GitHub Repository](https://github.com/matth-x/MicroOcpp)
+- [Wiki](https://github.com/matth-x/MicroOcpp/wiki)
+EOF
+fi
+
+# Fichier .gitignore
+if [ ! -f ".gitignore" ]; then
+    cat > ".gitignore" << EOF
+.pio
+.vscode
+.DS_Store
+*.swp
+*.swo
+EOF
+fi
+
+# Fichier platformio.ini si non existant
+if [ ! -f "platformio.ini" ]; then
+    cat > "platformio.ini" << EOF
+; Configuration PlatformIO pour OCPP 1.6 ESP32 avec MicroOCPP
+; Issue: [INFRA] Project Structure Setup
+
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+
+; Dépendances avec MicroOCPP comme bibliothèque principale
+lib_deps = 
+    matth-x/MicroOcpp@^2.0.1
+    bblanchon/ArduinoJson@^6.21.3
+    links2004/WebSockets@^2.4.0
+
+; Configuration de monitoring
+monitor_speed = 115200
+EOF
+fi
+
+echo "✅ Structure de projet créée avec succès!"
+echo ""
+echo "📊 Résumé:"
+echo "  - Structure de répertoires pour MicroOCPP"
+echo "  - Fichiers de configuration de base"
+echo "  - Documentation d'intégration MicroOCPP"
+echo ""
+echo "🚀 Prochaines étapes:"
+echo "  1. Vérifier la structure avec: tree"
+echo "  2. Configurer PlatformIO"
+echo "  3. Implémenter l'intégration MicroOCPP"

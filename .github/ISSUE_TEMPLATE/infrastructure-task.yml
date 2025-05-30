@@ -1,0 +1,103 @@
+name: 🏗️ Infrastructure Task
+description: Create a new infrastructure-related task
+title: "[INFRA] "
+labels: ["ocpp:infrastructure", "type:chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## 🏗️ Infrastructure Task
+        Use this template for infrastructure-related tasks.
+        
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What is the goal of this infrastructure task?
+      placeholder: "Implement a robust WebSocket client for OCPP communication..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: List the specific requirements for this task
+      value: |
+        - [ ] Requirement 1
+        - [ ] Requirement 2
+        - [ ] Requirement 3
+    validations:
+      required: true
+      
+  - type: textarea
+    id: technical_details
+    attributes:
+      label: Technical Details
+      description: Provide technical information and implementation notes
+      placeholder: "Use the WebSockets library by Links2004..."
+    validations:
+      required: false
+      
+  - type: textarea
+    id: tasks
+    attributes:
+      label: Tasks
+      description: Break down the implementation into specific tasks
+      value: |
+        - [ ] Task 1
+        - [ ] Task 2
+        - [ ] Write unit tests
+        - [ ] Update documentation
+    validations:
+      required: true
+      
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List any dependencies on other issues
+      placeholder: "Depends on #XX, Blocks #YY"
+    validations:
+      required: false
+      
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Define when this task can be considered complete
+      value: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] All tests pass
+        - [ ] Documentation updated
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: estimation
+    attributes:
+      label: Estimation (Story Points)
+      description: Estimate the complexity of this task
+      options:
+        - 1 (Very simple)
+        - 2 (Simple)
+        - 3 (Moderate)
+        - 5 (Complex)
+        - 8 (Very complex)
+        - 13 (Extremely complex)
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Which milestone does this task belong to?
+      options:
+        - "Foundation Setup"
+        - "Network & Communication"
+        - "Data Management"
+        - "Testing & Monitoring"
+    validations:
+      required: true

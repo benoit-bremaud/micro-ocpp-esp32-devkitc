@@ -1,0 +1,15 @@
+{
+  "blank_issues_enabled": false,
+  "contact_links": [
+    {
+      "name": "📚 Documentation OCPP",
+      "url": "https://github.com/benoit-bremaud/micro-ocpp-esp32-devkitc/blob/main/OCPP_1.6_documentation/",
+      "about": "Consulter la documentation OCPP 1.6"
+    },
+    {
+      "name": "🏗️ Architecture du projet",
+      "url": "https://github.com/benoit-bremaud/micro-ocpp-esp32-devkitc/blob/main/ARCHITECTURE.md",
+      "about": "Comprendre l'architecture du projet"
+    }
+  ]
+}

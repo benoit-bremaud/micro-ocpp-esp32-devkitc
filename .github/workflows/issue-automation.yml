@@ -1,0 +1,34 @@
+name: Issue Automation
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  auto-assign-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Core issues to Project 16
+        if: contains(github.event.issue.labels.*.name, 'ocpp-core')
+        uses: actions/add-to-project@v0.4.0
+        with:
+          project-url: https://github.com/users/benoit-bremaud/projects/16
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Add Optional issues to Project 22
+        if: contains(github.event.issue.labels.*.name, 'ocpp-optional')
+        uses: actions/add-to-project@v0.4.0
+        with:
+          project-url: https://github.com/users/benoit-bremaud/projects/22
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  create-branch:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'enhancement')
+    steps:
+      - name: Create feature branch
+        uses: peterjgrainger/action-create-branch@v2.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: 'feature/issue-${{ github.event.issue.number }}-${{ github.event.issue.title }}'

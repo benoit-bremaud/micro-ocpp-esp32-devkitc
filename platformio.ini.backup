@@ -10,7 +10,6 @@ framework = arduino
 lib_deps = 
     bblanchon/ArduinoJson@^6.21.3
     links2004/WebSockets@^2.4.0
-    https://github.com/matth-x/MicroOcpp.git
 
 ; Configuration des chemins sources
 build_src_filter = 
@@ -37,10 +36,3 @@ board_build.f_cpu = 240000000L
 board_build.f_flash = 80000000L
 board_build.flash_mode = dio
 board_upload.flash_size = 4MB
-
-; Dépendance MicroOCPP manquante
-    https://github.com/matth-x/MicroOcpp.git
-
-; Configuration des tests
-test_framework = unity
-test_build_src = yes
