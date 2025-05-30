@@ -1,0 +1,294 @@
+/**
+* @file main_complete.cpp
+* @brief Version complète avec tous les gestionnaires - CORRIGÉE
+* 
+* Issue: #62 - [INFRA] ESP32 Hardware Configuration
+* Version finale opérationnelle avec méthode blinkErrorLed
+*/
+
+#include <Arduino.h>
+#include <WiFi.h>
+
+// Configuration du projet
+#include "project_config.h"
+#include "hardware_config.h"
+#include "hardware/hardware_manager.h"
+#include "hardware/power_manager.h"
+#include "hardware/watchdog_manager.h"
+
+// Instances des gestionnaires
+HardwareManager hardwareManager;
+PowerManager powerManager;
+WatchdogManager watchdogManager;
+
+// Variables de contrôle
+unsigned long lastHeartbeat = 0;
+unsigned long lastMeasurement = 0;
+unsigned long lastPowerStats = 0;
+unsigned long lastWatchdogFeed = 0;
+unsigned long lastStateDemo = 0;
+uint8_t demoStep = 0;
+
+// IDs des watchdogs
+int measurement_wdt_id = -1;
+int heartbeat_wdt_id = -1;
+
+// Callbacks d'alerte
+void onLowVoltage(float voltage) {
+    Serial.printf("⚠️ ALERTE: Tension faible: %.2f V\n", voltage);
+    hardwareManager.setErrorLed(true);
+    hardwareManager.buzzer(200);
+}
+
+void onOverheat(float temperature) {
+    Serial.printf("🔥 ALERTE: Surchauffe: %.1f °C\n", temperature);
+    hardwareManager.setErrorLed(true);
+    powerManager.setEcoMode(true);
+}
+
+void onWatchdogTimeout(int watchdog_id) {
+    watchdog_info_t info = watchdogManager.getWatchdogInfo(watchdog_id);
+    Serial.printf("🚨 TIMEOUT: %s (ID: %d)\n", info.config.name, watchdog_id);
+    hardwareManager.blinkErrorLed(100); // ✅ Maintenant cette méthode existe !
+}
+
+void setup() {
+    Serial.begin(SERIAL_BAUD_RATE);
+    delay(2000);
+    
+    Serial.println();
+    Serial.println("=================================");
+    Serial.println("ESP32 OCPP Infrastructure");
+    Serial.println("    Version Complète CORRIGÉE");
+    Serial.println("    Hardware + Power + Watchdog");
+    Serial.println("=================================");
+    
+    #ifdef SIMULATION_MODE
+    Serial.println("⚠️ MODE SIMULATION ACTIVÉ");
+    #endif
+    
+    // Informations système
+    Serial.printf("Board: %s %s\n", BOARD_NAME, BOARD_VERSION);
+    Serial.printf("CPU: %d MHz, Flash: %d MB, Heap: %d bytes\n", 
+                 getCpuFrequencyMhz(), ESP.getFlashChipSize()/(1024*1024), ESP.getFreeHeap());
+    
+    // ========================================================================
+    // INITIALISATION SÉQUENTIELLE
+    // ========================================================================
+    
+    // 1. Watchdog Manager
+    Serial.println("\n🐕 Initialisation Watchdog Manager...");
+    if (!watchdogManager.init()) {
+        Serial.println("❌ Erreur Watchdog Manager");
+        while(1) delay(1000);
+    }
+    watchdogManager.setGlobalTimeoutCallback(onWatchdogTimeout);
+    watchdogManager.setDebugMode(true);
+    
+    // 2. Power Manager  
+    Serial.println("\n🔋 Initialisation Power Manager...");
+    if (!powerManager.init()) {
+        Serial.println("❌ Erreur Power Manager");
+        while(1) delay(1000);
+    }
+    powerManager.setLowVoltageCallback(onLowVoltage);
+    powerManager.setOverheatCallback(onOverheat);
+    
+    // 3. Hardware Manager
+    Serial.println("\n🔧 Initialisation Hardware Manager...");
+    if (!hardwareManager.init()) {
+        Serial.println("❌ Erreur Hardware Manager");
+        while(1) delay(1000);
+    }
+    
+    // ========================================================================
+    // CONFIGURATION DES WATCHDOGS
+    // ========================================================================
+    
+    measurement_wdt_id = watchdogManager.registerTaskWatchdog("Measurements", 10000);
+    heartbeat_wdt_id = watchdogManager.registerTaskWatchdog("Heartbeat", 15000);
+    
+    if (measurement_wdt_id < 0 || heartbeat_wdt_id < 0) {
+        Serial.println("⚠️ Erreur enregistrement watchdogs personnalisés");
+    }
+    
+    // ========================================================================
+    // TESTS AUTOMATIQUES
+    // ========================================================================
+    
+    Serial.println("\n🧪 Tests automatiques...");
+    if (watchdogManager.runSelfTest()) {
+        Serial.println("✅ Tous les tests réussis");
+    } else {
+        Serial.println("⚠️ Certains tests ont échoué");
+    }
+    
+    // ========================================================================
+    // FINALISATION
+    // ========================================================================
+    
+    Serial.println("\n🚀 Système complètement opérationnel!");
+    Serial.println("💓 Démarrage des boucles principales...\n");
+    
+    // Séquence de démarrage
+    for (int i = 0; i < 5; i++) {
+        hardwareManager.setStatusLed(true);
+        delay(100);
+        hardwareManager.setStatusLed(false);
+        delay(100);
+    }
+    
+    // Démarrer le clignotement normal
+    hardwareManager.blinkStatusLed(1000);
+    
+    // Initialiser les timers
+    lastHeartbeat = millis();
+    lastMeasurement = millis();
+    lastPowerStats = millis();
+    lastWatchdogFeed = millis();
+    lastStateDemo = millis();
+    
+    // Afficher l'état initial
+    watchdogManager.printWatchdogStatus();
+}
+
+void loop() {
+    unsigned long now = millis();
+    
+    // ========================================================================
+    // BOUCLES DES GESTIONNAIRES
+    // ========================================================================
+    
+    hardwareManager.loop();
+    powerManager.loop();
+    watchdogManager.loop();
+    
+    // Nourrir le watchdog principal
+    watchdogManager.feedMainLoop();
+    
+    // ========================================================================
+    // WATCHDOG ESP32 NATIF (toutes les 5 secondes)
+    // ========================================================================
+    
+    if (now - lastWatchdogFeed >= 5000) {
+        #ifdef CONFIG_ESP_TASK_WDT_EN
+        esp_task_wdt_reset();
+        #endif
+        lastWatchdogFeed = now;
+    }
+    
+    // ========================================================================
+    // HEARTBEAT (toutes les 10 secondes)
+    // ========================================================================
+    
+    if (now - lastHeartbeat >= 10000) {
+        Serial.printf("💓 [%8lu] Heartbeat - HW:%d Power:%d WDT:%s Heap:%d\n", 
+                     now, hardwareManager.getState(), powerManager.getMode(),
+                     watchdogManager.isSystemHealthy() ? "OK" : "WARN", ESP.getFreeHeap());
+        
+        // Nourrir le watchdog de heartbeat
+        if (heartbeat_wdt_id >= 0) {
+            watchdogManager.feedWatchdog(heartbeat_wdt_id);
+        }
+        
+        lastHeartbeat = now;
+    }
+    
+    // ========================================================================
+    // MESURES HARDWARE (toutes les 5 secondes)
+    // ========================================================================
+    
+    if (now - lastMeasurement >= 5000) {
+        hardware_measurements_t hw = hardwareManager.readMeasurements();
+        
+        Serial.printf("📊 [%8lu] Hardware: L1=%.2fA L2=%.2fA V=%.1fV T=%.1f°C P=%.2fkW\n",
+                     hw.timestamp, hw.current_l1, hw.current_l2, hw.voltage, hw.temperature, hw.power);
+        
+        // Nourrir le watchdog de mesures
+        if (measurement_wdt_id >= 0) {
+            watchdogManager.feedWatchdog(measurement_wdt_id);
+        }
+        
+        // Nourrir le watchdog de communication
+        watchdogManager.feedCommunication();
+        
+        lastMeasurement = now;
+    }
+    
+    // ========================================================================
+    // STATISTIQUES POWER (toutes les 15 secondes)
+    // ========================================================================
+    
+    if (now - lastPowerStats >= 15000) {
+        power_measurements_t power = powerManager.readMeasurements();
+        
+        Serial.printf("🔋 [%8lu] Power: %.2fV/%.0fmA=%.0fmW CPU:%.0fMHz Load:%d%% T:%.1f°C\n",
+                     now, power.input_voltage, power.input_current, power.power_consumption,
+                     power.cpu_frequency, power.cpu_load, power.temperature);
+        
+        lastPowerStats = now;
+    }
+    
+    // ========================================================================
+    // DÉMONSTRATION DES MODES (toutes les 60 secondes)
+    // ========================================================================
+    
+    if (now - lastStateDemo >= 60000) {
+        demoStep = (demoStep + 1) % 6;
+        
+        switch (demoStep) {
+            case 0:
+                Serial.println("🔄 DEMO: Mode actif normal");
+                powerManager.setMode(POWER_MODE_ACTIVE);
+                hardwareManager.blinkStatusLed(1000);
+                break;
+                
+            case 1:
+                Serial.println("🔄 DEMO: Mode économie d'énergie");
+                powerManager.setEcoMode(true);
+                hardwareManager.blinkStatusLed(2000);
+                break;
+                
+            case 2:
+                Serial.println("🔄 DEMO: Fréquence CPU réduite");
+                powerManager.setCpuFrequency(80);
+                break;
+                
+            case 3:
+                Serial.println("🔄 DEMO: Statistiques complètes");
+                powerManager.printPowerStats();
+                watchdogManager.printWatchdogStatus();
+                break;
+                
+            case 4:
+                Serial.println("🔄 DEMO: Test watchdog temporaire");
+                {
+                    watchdog_config_t test_config = {
+                        .type = WDT_TYPE_CUSTOM,
+                        .timeout_ms = 3000,
+                        .action = WDT_ACTION_LOG,
+                        .auto_reset = true,
+                        .enabled = true,
+                        .name = "DemoTest",
+                        .callback = nullptr
+                    };
+                    int demo_id = watchdogManager.registerWatchdog(test_config);
+                    Serial.printf("🐕 Watchdog démo créé (ID: %d)\n", demo_id);
+                }
+                break;
+                
+            case 5:
+                Serial.println("🔄 DEMO: Retour mode normal");
+                powerManager.setMode(POWER_MODE_ACTIVE);
+                powerManager.setEcoMode(false);
+                powerManager.setCpuFrequency(240);
+                hardwareManager.blinkStatusLed(1000);
+                break;
+        }
+        
+        lastStateDemo = now;
+    }
+    
+    // Pause pour éviter la surcharge CPU
+    delay(10);
+}
