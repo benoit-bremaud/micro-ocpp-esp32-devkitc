@@ -1,0 +1,185 @@
+/**
+* @file main.cpp
+* @brief Point d'entrée principal - Version Debug Sécurisée
+* 
+* Issue: #62 - [INFRA] ESP32 Hardware Configuration
+* Version avec gestion d'erreurs renforcée
+*/
+
+#include <Arduino.h>
+#include <WiFi.h>
+
+// Configuration du projet
+#include "project_config.h"
+#include "hardware_config.h"
+
+// Inclure les gestionnaires un par un pour identifier les problèmes
+#include "hardware/hardware_manager.h"
+
+// Variables globales
+HardwareManager* hardwareManager = nullptr;
+unsigned long lastHeartbeat = 0;
+bool initSuccess = false;
+
+// Fonction de gestion des exceptions
+void handleException(const char* location, const char* error) {
+    Serial.printf("❌ EXCEPTION dans %s: %s\n", location, error);
+    Serial.printf("   Free Heap: %d bytes\n", ESP.getFreeHeap());
+    Serial.printf("   Stack: %d bytes\n", uxTaskGetStackHighWaterMark(NULL));
+    
+    // Clignoter rapidement la LED d'erreur
+    pinMode(LED_STATUS_PIN, OUTPUT);
+    for (int i = 0; i < 10; i++) {
+        digitalWrite(LED_STATUS_PIN, HIGH);
+        delay(100);
+        digitalWrite(LED_STATUS_PIN, LOW);
+        delay(100);
+    }
+    
+    // Redémarrer après 5 secondes
+    Serial.println("🔄 Redémarrage dans 5 secondes...");
+    delay(5000);
+    ESP.restart();
+}
+
+void setup() {
+    Serial.begin(SERIAL_BAUD_RATE);
+    
+    // Attendre que le port série soit prêt avec timeout
+    unsigned long start = millis();
+    while (!Serial && (millis() - start < 3000)) {
+        delay(10);
+    }
+    
+    Serial.println();
+    Serial.println("=================================");
+    Serial.println("ESP32 Hardware Manager - DEBUG");
+    Serial.println("     DOIT DevKitC v1");
+    Serial.println("     Version Sécurisée");
+    Serial.println("=================================");
+    
+    #ifdef SIMULATION_MODE
+    Serial.println("⚠️ MODE SIMULATION ACTIVÉ");
+    #endif
+    
+    // Afficher les informations système
+    Serial.printf("Board: %s %s\n", BOARD_NAME, BOARD_VERSION);
+    Serial.printf("CPU Freq: %d MHz\n", getCpuFrequencyMhz());
+    Serial.printf("Flash Size: %d MB\n", ESP.getFlashChipSize() / (1024 * 1024));
+    Serial.printf("Free Heap: %d bytes\n", ESP.getFreeHeap());
+    Serial.printf("Stack disponible: %d bytes\n", uxTaskGetStackHighWaterMark(NULL));
+    
+    // Test de base des pins
+    Serial.println("🔧 Test des pins de base...");
+    pinMode(LED_STATUS_PIN, OUTPUT);
+    pinMode(LED_ERROR_PIN, OUTPUT);
+    
+    digitalWrite(LED_STATUS_PIN, LOW);
+    digitalWrite(LED_ERROR_PIN, LOW);
+    
+    // Test LED
+    for (int i = 0; i < 3; i++) {
+        digitalWrite(LED_STATUS_PIN, HIGH);
+        delay(200);
+        digitalWrite(LED_STATUS_PIN, LOW);
+        delay(200);
+    }
+    
+    Serial.println("✅ Test des pins OK");
+    
+    // ========================================================================
+    // INITIALISATION SÉCURISÉE DU GESTIONNAIRE HARDWARE
+    // ========================================================================
+    
+    try {
+        Serial.println("🔧 Initialisation du gestionnaire hardware...");
+        
+        // Allouer le gestionnaire
+        hardwareManager = new HardwareManager();
+        if (!hardwareManager) {
+            handleException("setup", "Allocation HardwareManager échouée");
+            return;
+        }
+        
+        Serial.printf("   Heap après allocation: %d bytes\n", ESP.getFreeHeap());
+        
+        // Initialiser
+        if (!hardwareManager->init()) {
+            handleException("setup", "Initialisation HardwareManager échouée");
+            return;
+        }
+        
+        Serial.printf("   Heap après init: %d bytes\n", ESP.getFreeHeap());
+        Serial.println("✅ Gestionnaire hardware initialisé");
+        
+        initSuccess = true;
+        
+    } catch (const std::exception& e) {
+        handleException("setup", e.what());
+        return;
+    } catch (...) {
+        handleException("setup", "Exception inconnue");
+        return;
+    }
+    
+    Serial.println("\n🚀 Initialisation terminée!");
+    Serial.println("💓 Démarrage de la boucle principale...\n");
+    
+    // Séquence de démarrage réussie
+    for (int i = 0; i < 5; i++) {
+        digitalWrite(LED_STATUS_PIN, HIGH);
+        delay(100);
+        digitalWrite(LED_STATUS_PIN, LOW);
+        delay(100);
+    }
+    
+    lastHeartbeat = millis();
+}
+
+void loop() {
+    unsigned long now = millis();
+    
+    // Vérifier que l'initialisation a réussi
+    if (!initSuccess || !hardwareManager) {
+        // Mode dégradé - juste clignoter la LED d'erreur
+        static unsigned long lastErrorBlink = 0;
+        if (now - lastErrorBlink >= 500) {
+            static bool errorLedState = false;
+            errorLedState = !errorLedState;
+            digitalWrite(LED_ERROR_PIN, errorLedState);
+            lastErrorBlink = now;
+        }
+        return;
+    }
+    
+    // ========================================================================
+    // BOUCLE SÉCURISÉE
+    // ========================================================================
+    
+    try {
+        // Boucle du gestionnaire hardware
+        hardwareManager->loop();
+        
+        // Heartbeat toutes les 10 secondes
+        if (now - lastHeartbeat >= 10000) {
+            Serial.printf("💓 [%8lu] Heartbeat - HW: %d, Heap: %d bytes, Stack: %d\n", 
+                         now, hardwareManager->getState(), ESP.getFreeHeap(),
+                         uxTaskGetStackHighWaterMark(NULL));
+            
+            // Afficher les mesures
+            hardware_measurements_t measurements = hardwareManager->readMeasurements();
+            Serial.printf("📊 Measurements: %.2f A, %.2f V, %.2f °C\n",
+                         measurements.current_l1, measurements.voltage, measurements.temperature);
+            
+            lastHeartbeat = now;
+        }
+        
+        // Petite pause pour éviter de surcharger le CPU
+        delay(10);
+        
+    } catch (const std::exception& e) {
+        handleException("loop", e.what());
+    } catch (...) {
+        handleException("loop", "Exception inconnue dans loop");
+    }
+}
