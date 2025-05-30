@@ -37,4 +37,32 @@ void Logger::log(LogLevel level, const char* file, const char* function, int lin
     String ts = getTimestampISO8601();
 
     Serial.printf("[%s] [%d] %s:%d (%s): %s\n", ts.c_str(), level, file, line, function, buffer);
+
+    // --- Add to circular buffer history ---
+    size_t pos;
+    if (historyCount < LOG_HISTORY_SIZE) {
+        pos = (historyHead + historyCount) % LOG_HISTORY_SIZE;
+        historyCount++;
+    } else {
+        pos = historyHead;
+        historyHead = (historyHead + 1) % LOG_HISTORY_SIZE;
+    }
+
+    history[pos].timestamp = ts;
+    history[pos].level = level;
+    history[pos].file = String(file);
+    history[pos].function = String(function);
+    history[pos].line = line;
+    history[pos].message = String(buffer);
 }
+
+void Logger::printLogHistory(Stream& out, size_t maxEntries) const {
+    size_t n = (maxEntries == 0 || maxEntries > historyCount) ? historyCount : maxEntries;
+    for (size_t i = 0; i < n; ++i) {
+        size_t idx = (historyHead + i) % LOG_HISTORY_SIZE;
+        const LogEntry& e = history[idx];
+        out.printf("[%s] [%d] %s:%d (%s): %s\n",
+                   e.timestamp.c_str(), e.level, e.file.c_str(), e.line, e.function.c_str(), e.message.c_str());
+    }
+}
+// --- End of Logger.cpp ---
