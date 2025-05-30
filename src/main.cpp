@@ -7,6 +7,7 @@
 */
 
 #include <Arduino.h>
+#include "log_macros.h"
 
 // Configuration simple
 #define LED_STATUS_PIN 2
@@ -20,6 +21,18 @@ bool ledState = false;
 void setup() {
     // Initialisation série avec délai
     Serial.begin(SERIAL_BAUD_RATE);
+
+    Logger::getInstance().setLevel(LOG_LEVEL_INFO);
+
+    LOG_DEBUG("Debug: Should NOT appear at INFO level");
+    LOG_INFO("Info: Should appear");
+    LOG_WARN("Warning: Should appear");
+    LOG_ERROR("Error: Should appear");
+
+    Logger::getInstance().setLevel(LOG_LEVEL_DEBUG);
+
+    LOG_DEBUG("Debug: Should appear at DEBUG level");
+    
     delay(2000); // Attendre que le port série soit stable
     
     Serial.println();
