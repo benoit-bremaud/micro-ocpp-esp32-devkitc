@@ -1,0 +1,38 @@
+; Configuration PlatformIO pour OCPP 1.6 ESP32
+; Issue: [INFRA] Project Structure Setup - Version de base
+
+[env:esp32dev]
+platform = espressif32
+board = esp32dev
+framework = arduino
+
+; Dépendances de base (sans MicroOCPP pour l'instant)
+lib_deps = 
+    bblanchon/ArduinoJson@^6.21.3
+    links2004/WebSockets@^2.4.0
+
+; Configuration des chemins sources
+build_src_filter = 
+    +<*>
+    +<../src/**/*.cpp>
+
+; Chemins d'inclusion
+build_flags = 
+    -I include
+    -I src/config
+    -I src/hardware
+    -I src/extensions
+    -D PROJECT_VERSION=\"2.0.0\"
+    -D OCPP_VERSION=\"1.6\"
+
+; Configuration de monitoring
+monitor_speed = 115200
+
+; Configuration de l'upload
+upload_speed = 921600
+
+; Configuration ESP32
+board_build.f_cpu = 240000000L
+board_build.f_flash = 80000000L
+board_build.flash_mode = dio
+board_upload.flash_size = 4MB
