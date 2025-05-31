@@ -45,7 +45,10 @@ void setup() {
     // 2. Initialisation SPIFFS (avant Logger, Web, etc.)
     if (!SPIFFS.begin(true)) {
         Serial.println("❌ SPIFFS mount failed!");
-        // Gérer l'erreur ou bloquer ici si SPIFFS requis
+        Serial.println("⚠️ Halting execution due to SPIFFS failure.");
+        while (true) {
+            delay(1000); // Halt execution indefinitely
+        }
     } else {
         Serial.println("✅ SPIFFS mount OK");
     }
