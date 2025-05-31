@@ -32,7 +32,7 @@ void printLogFile(const char* filename) {
         }
         file.close();
     } else {
-        Serial.printf("❌ Impossible d'ouvrir %s\n", filename);
+        Serial.printf("❌ Unable to open %s\n", filename);
     }
 }
 
