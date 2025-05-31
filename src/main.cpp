@@ -117,17 +117,23 @@ void loop() {
     }
 
     // Affichage du log
-    if (Serial.available()) {
-        String input = Serial.readStringUntil('\n');
-        if (input.startsWith("log ")) {
-            String filename = input.substring(4);
-            if (filename.length() > 0) {
-                printLogFile(filename.c_str());
+    static String inputBuffer = ""; // Buffer to accumulate input
+    while (Serial.available()) {
+        char receivedChar = Serial.read();
+        if (receivedChar == '\n') {
+            if (inputBuffer.startsWith("log ")) {
+                String filename = inputBuffer.substring(4);
+                if (filename.length() > 0) {
+                    printLogFile(filename.c_str());
+                } else {
+                    Serial.println("❌ Veuillez spécifier un nom de fichier.");
+                }
             } else {
-                Serial.println("❌ Veuillez spécifier un nom de fichier.");
+                Serial.printf("📥 Commande reçue: %s\n", inputBuffer.c_str());
             }
+            inputBuffer = ""; // Clear the buffer after processing
         } else {
-            Serial.printf("📥 Commande reçue: %s\n", input.c_str());
+            inputBuffer += receivedChar; // Accumulate characters
         }
     }
 
