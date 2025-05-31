@@ -5,6 +5,8 @@
 
 enum LogLevel { LOG_LEVEL_DEBUG = 0, LOG_LEVEL_INFO, LOG_LEVEL_WARNING, LOG_LEVEL_ERROR, LOG_LEVEL_NONE };
 
+const char* logLevelToString(LogLevel level);
+
 struct LogEntry {
     String timestamp;
     LogLevel level;

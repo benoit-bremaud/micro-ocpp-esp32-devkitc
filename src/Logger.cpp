@@ -3,6 +3,17 @@
 #include <Arduino.h>
 #include "FileLogger.h"
 
+const char* logLevelToString(LogLevel level) {
+    switch (level) {
+        case LOG_LEVEL_DEBUG:   return "DEBUG";
+        case LOG_LEVEL_INFO:    return "INFO";
+        case LOG_LEVEL_WARNING: return "WARN";
+        case LOG_LEVEL_ERROR:   return "ERROR";
+        case LOG_LEVEL_NONE:    return "NONE";
+        default:                return "UNK";
+    }
+}
+
 static FileLogger fileLogger;
 
 // --- Timestamp ISO 8601 uptime ---
@@ -47,7 +58,7 @@ void Logger::log(LogLevel level, const char* file, const char* function, int lin
 
     String ts = getTimestampISO8601();
 
-    Serial.printf("[%s] [%d] %s:%d (%s): %s\n", ts.c_str(), level, file, line, function, buffer);
+    Serial.printf("[%s] [%s] %s:%d (%s): %s\n", ts.c_str(), logLevelToString(level), file, line, function, buffer);
 
     // --- Add to circular buffer history ---
     size_t pos;
@@ -72,8 +83,7 @@ void Logger::printLogHistory(Stream& out, size_t maxEntries) const {
     for (size_t i = 0; i < n; ++i) {
         size_t idx = (historyHead + i) % LOG_HISTORY_SIZE;
         const LogEntry& e = history[idx];
-        out.printf("[%s] [%d] %s:%d (%s): %s\n",
-                   e.timestamp.c_str(), e.level, e.file.c_str(), e.line, e.function.c_str(), e.message.c_str());
+        out.printf("[%s] [%s] %s:%d (%s): %s\n",
+           e.timestamp.c_str(), logLevelToString(e.level), e.file.c_str(), e.line, e.function.c_str(), e.message.c_str());
     }
 }
-// --- End of Logger.cpp ---

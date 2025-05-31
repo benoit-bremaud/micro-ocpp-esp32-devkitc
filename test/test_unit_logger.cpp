@@ -4,9 +4,8 @@
 
 #include "FileLogger.h"
 
-// Indique EXPLICITEMENT le chemin correct du Logger.h ET du Logger.cpp
 #include "../features/infra/logging/Logger.h"
-#include "../features/infra/logging/Logger.h"
+
 #include "../features/infra/logging/log_macros.h" // Pour les macros LOG_DEBUG
 
 void test_log_history_overflow() {
