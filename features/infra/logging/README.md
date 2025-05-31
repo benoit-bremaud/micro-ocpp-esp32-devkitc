@@ -5,18 +5,23 @@
 This directory contains the unified logging system for the VEV-Gateway ESP32 external OCPP interface module.
 
 The logger provides a consistent, configurable, and lightweight way to trace and debug all system activities.
-It supports log levels, contextual information, and is designed for future extensions (persistent storage, web viewing, memory monitoring).
+It supports log levels, contextual information, and persistent output to SPIFFS and WebServer.
 
 ---
 
 ## Features
 
-* **Log levels:** DEBUG, INFO, WARNING, ERROR (settable at runtime or compile-time)
+* **Log levels:** `DEBUG`, `INFO`, `WARNING`, `ERROR`, `NONE` – settable dynamically or statically
 * **Macros:** Easy-to-use macros for logging: `LOG_DEBUG`, `LOG_INFO`, `LOG_WARN`, `LOG_ERROR`
-* **Automatic context:** Each log entry includes timestamp, file, function, and line number
-* **Output:** Serial console (default), ready for SPIFFS or web in future versions
-* **Minimal footprint:** Optimized for embedded constraints
-* **Extensible:** Buffering, rotation, and remote streaming planned
+* **Automatic context:** Timestamp, file, function, and line number included in each entry
+* **Output targets:**
+
+  * Serial console (default)
+  * SPIFFS with file rotation
+  * HTTP Web log viewer (`/log` endpoint)
+* **Circular buffer:** In-memory log history (configurable size, FIFO behavior)
+* **Minimal footprint:** Designed for ESP32 constraints, minimal allocations
+* **Modular design:** Based on feature-oriented structure for scalability
 
 ---
 
@@ -24,38 +29,40 @@ It supports log levels, contextual information, and is designed for future exten
 
 ### 1. Include the Logger
 
-In any file where you need logging, add:
+In any `.cpp` file:
 
 ```cpp
 #include "log_macros.h"
 ```
 
-### 2. Set log level (usually in `setup()`)
+### 2. Initialize logger (in `setup()`)
+
+```cpp
+Logger::getInstance().begin(true);  // true enables SPIFFS file logging
+```
+
+### 3. Set log level
 
 ```cpp
 Logger::getInstance().setLevel(LOG_LEVEL_INFO);  // or LOG_LEVEL_DEBUG
 ```
 
-### 3. Add log statements
+### 4. Use logging macros
 
 ```cpp
 LOG_DEBUG("Debug value: %d", value);
-LOG_INFO("System started");
-LOG_WARN("Possible issue detected");
-LOG_ERROR("Fatal error: %s", msg);
+LOG_INFO("System initialized");
+LOG_WARN("Low memory warning");
+LOG_ERROR("Critical error: %s", msg);
 ```
 
-Context (file, function, line) and timestamp are automatic.
+Each message automatically includes file/function/line info and ISO 8601 uptime timestamp.
 
-### 4. Output format
+### 5. View logs
 
-Serial output example:
-
-```
-[0000-00-00T01:23:45Z] [1] main.cpp:34 (setup): System started
-```
-
-* `[timestamp] [log level] file:line (function): message`
+* **Serial output**: logs are printed in structured format.
+* **SPIFFS files**: logs are written in `/log_0.txt`, `/log_1.txt`, etc. with automatic rotation.
+* **Web viewer**: start WebServer and access `http://<ESP32-IP>/log` to view log history.
 
 ---
 
@@ -64,41 +71,73 @@ Serial output example:
 ```
 features/
   └── infra/
-       └── logging/
-           ├── Logger.h
-           ├── log_macros.h
+       ├── logging/
+       │   ├── Logger.h
+       │   ├── log_macros.h
+       │   ├── file_logger.h
+       └── web/
+           └── web_log_viewer.h
 src/
-  ├── main.cpp
   ├── Logger.cpp
+  ├── FileLogger.cpp
+  ├── WebLogViewer.cpp
+  └── main.cpp
 ```
 
-* All `.cpp` files **must be in `/src/`** to be built by PlatformIO
-* Headers can be organized freely, as long as include paths are set in `platformio.ini`
+> Note: All `.cpp` files **must** be placed under `/src/` for PlatformIO to compile them.
 
 ---
 
-## Advanced Usage
+## Configuration
 
-* **Change timestamp to real UTC:** If WiFi/NTP/RTC is available, update `getTimestampISO8601()` for real time
-* **Buffering & SPIFFS:** Circular buffer and file logging coming soon
-* **Web viewer:** HTTP log endpoint planned for embedded diagnostics
+### `platformio.ini`
+
+Ensure these flags and include paths are defined:
+
+```ini
+build_flags =
+    -I include
+    -I features
+    -I features/infra
+    -I features/infra/logging
+    -I features/infra/web
+    -I src
+    -D PROJECT_VERSION=\"2.0.0\"
+    -D OCPP_VERSION=\"1.6\"
+```
+
+---
+
+## Web Viewer Endpoint
+
+The embedded log viewer is available at `/log` (GET).
+It displays recent log entries from the in-memory circular buffer in plain text.
+Useful for diagnostics via browser or REST client (e.g., `curl http://<ip>/log`).
+
+Make sure WebServer is initialized in `setup()`:
+
+```cpp
+WebLogViewer::getInstance().begin(server);  // 'server' is your WebServer instance
+```
 
 ---
 
 ## Troubleshooting
 
-* If you get linker errors: ensure `Logger.cpp` is present in `/src/`
-* If logs do not appear: verify log level and serial speed (`115200`)
-* Compilation errors: check include paths in `platformio.ini` and header locations
+* **Linker errors**: Ensure all `.cpp` are in `/src/` and headers are correctly included
+* **Missing logs**: Check `Logger::setLevel()` and ensure `begin()` is called
+* **SPIFFS issues**: Verify SPIFFS mount is successful (`SPIFFS.begin()`)
+* **Web log viewer fails**: Confirm `WebServer` is running and IP is accessible
 
 ---
 
 ## References
 
 * VEV-Gateway Project Canvas
-* OCPP 1.6/2.0.1 Specification – Logging/Diagnostics
+* OCPP 1.6J – Diagnostics section
 * ESP32 / PlatformIO documentation
+* Arduino WebServer library reference
 
 ---
 
-*For questions, open an issue or refer to the documentation in `/docs/`.*
+*For feedback or contributions, open an issue in the repository or refer to `/docs/`.*
