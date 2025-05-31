@@ -1,5 +1,7 @@
 #pragma once
 #include <Arduino.h>
+#include "FileLogger.h"
+
 
 enum LogLevel { LOG_LEVEL_DEBUG = 0, LOG_LEVEL_INFO, LOG_LEVEL_WARNING, LOG_LEVEL_ERROR, LOG_LEVEL_NONE };
 
@@ -16,6 +18,10 @@ class Logger {
 public:
     static Logger& getInstance();
     void setLevel(LogLevel level);
+
+    void begin(bool enableSPIFFS = false);
+    void end();
+
     LogLevel getLevel() const;
     void log(LogLevel level, const char* file, const char* function, int line, const char* format, ...);
 

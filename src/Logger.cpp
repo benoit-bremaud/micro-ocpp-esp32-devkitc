@@ -1,6 +1,9 @@
 #include "Logger.h"
 #include <stdarg.h>
 #include <Arduino.h>
+#include "FileLogger.h"
+
+static FileLogger fileLogger;
 
 // --- Timestamp ISO 8601 uptime ---
 String getTimestampISO8601() {
@@ -21,6 +24,17 @@ Logger& Logger::getInstance() {
 }
 
 Logger::Logger() : currentLevel(LOG_LEVEL_INFO) {}
+
+void Logger::begin(bool enableSPIFFS) {
+    if (enableSPIFFS) {
+        if (!SPIFFS.begin(true)) {
+            Serial.println("[Logger] SPIFFS mount failed");
+        } else {
+            fileLogger.begin();
+        }
+    }
+    Serial.println("[Logger] Initialized");
+}
 
 void Logger::setLevel(LogLevel level) { currentLevel = level; }
 LogLevel Logger::getLevel() const { return currentLevel; }

@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include <unity.h>
+#include <SPIFFS.h>
+
+#include "FileLogger.cpp"
 
 // Indique EXPLICITEMENT le chemin correct du Logger.h ET du Logger.cpp
 #include "../features/infra/logging/Logger.h"
@@ -55,4 +58,13 @@ void test_log_context_integrity() {
     TEST_ASSERT_TRUE(entry.file.length() > 0);
     TEST_ASSERT_TRUE(entry.function.length() > 0);
     TEST_ASSERT_TRUE(entry.line > 0);
+}
+
+void test_logger_spiffs() {
+    TEST_ASSERT_TRUE(SPIFFS.begin(true));
+    File f = SPIFFS.open("/unittest.txt", FILE_WRITE);
+    TEST_ASSERT_TRUE(f);
+    f.println("hello");
+    f.close();
+    TEST_ASSERT_TRUE(SPIFFS.exists("/unittest.txt"));
 }
