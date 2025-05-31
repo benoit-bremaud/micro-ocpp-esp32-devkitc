@@ -10,8 +10,8 @@ FileLogger::~FileLogger() {
 }
 
 bool FileLogger::begin() {
-    if (!SPIFFS.begin(true)) {
-        Serial.println("[FileLogger] SPIFFS mount failed");
+    if (!SPIFFS.exists("/")) { // Check if the filesystem is mounted
+        Serial.println("[FileLogger] SPIFFS not mounted. Please call SPIFFS.begin() at startup.");
         return false;
     }
 
