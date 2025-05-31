@@ -26,12 +26,9 @@ Logger& Logger::getInstance() {
 Logger::Logger() : currentLevel(LOG_LEVEL_INFO) {}
 
 void Logger::begin(bool enableSPIFFS) {
+    // Prérequis : SPIFFS doit être monté (SPIFFS.begin()) avant d'appeler cette méthode.
     if (enableSPIFFS) {
-        if (!SPIFFS.begin(true)) {
-            Serial.println("[Logger] SPIFFS mount failed");
-        } else {
-            fileLogger.begin();
-        }
+        fileLogger.begin();
     }
     Serial.println("[Logger] Initialized");
 }

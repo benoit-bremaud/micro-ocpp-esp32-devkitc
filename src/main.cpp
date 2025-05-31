@@ -38,38 +38,49 @@ void printLogFile(const char* filename) {
 
 
 void setup() {
-    // Initialisation série avec délai
+    // 1. Initialisation série (avant tout le reste)
     Serial.begin(SERIAL_BAUD_RATE);
+    delay(2000); // Attendre que le port série soit prêt
 
-    Logger::getInstance().begin(true); // Initialisation du logger
-    
+    // 2. Initialisation SPIFFS (avant Logger, Web, etc.)
+    if (!SPIFFS.begin(true)) {
+        Serial.println("❌ SPIFFS mount failed!");
+        // Gérer l'erreur ou bloquer ici si SPIFFS requis
+    } else {
+        Serial.println("✅ SPIFFS mount OK");
+    }
+
+    // 3. Initialisation du Logger (ne refait PAS SPIFFS.begin())
+    Logger::getInstance().begin(false); // Paramètre 'enableSPIFFS' optionnel ici
+
+    // 4. Configuration du niveau de log
     Logger::getInstance().setLevel(LOG_LEVEL_INFO);
+
+    // 5. Démo des logs
     LOG_DEBUG("Debug: Should NOT appear at INFO level");
     LOG_INFO("Info: Should appear");
     LOG_WARN("Warning: Should appear");
     LOG_ERROR("Error: Should appear");
-
     Logger::getInstance().setLevel(LOG_LEVEL_DEBUG);
     LOG_DEBUG("Debug: Should appear at DEBUG level");
-    
-    delay(2000); // Attendre que le port série soit stable
-    
+
+    // 6. Affichage d'en-tête
     Serial.println();
     Serial.println("=================================");
     Serial.println("ESP32 DEBUG MODE - Version Simple");
     Serial.println("=================================");
-    
-    // Configuration des pins
+
+    // 7. Configuration matérielle
     pinMode(LED_STATUS_PIN, OUTPUT);
     digitalWrite(LED_STATUS_PIN, LOW);
-    
-    // Test de base
+
+    // 8. Infos système
     Serial.println("✅ Initialisation série OK");
     Serial.printf("CPU Freq: %d MHz\n", getCpuFrequencyMhz());
     Serial.printf("Free Heap: %d bytes\n", ESP.getFreeHeap());
     Serial.printf("Flash Size: %d MB\n", ESP.getFlashChipSize() / (1024 * 1024));
-    
-    // Test LED
+
+    // 9. Test LED
     Serial.println("🔵 Test LED...");
     for (int i = 0; i < 5; i++) {
         digitalWrite(LED_STATUS_PIN, HIGH);
@@ -78,11 +89,16 @@ void setup() {
         delay(200);
         Serial.printf("  Blink %d/5\n", i + 1);
     }
-    
+
+    // 10. Lancement de la boucle principale
     Serial.println("🚀 Démarrage de la boucle principale...");
     lastBlink = millis();
     lastHeartbeat = millis();
+
+    // 11. (Optionnel) Démarrage du web log viewer si besoin
+    // startWebLogViewer();
 }
+
 
 void loop() {
     unsigned long now = millis();
