@@ -19,6 +19,8 @@
 #include "log_macros.h"
 #include "FileLogger.h"
 
+WebServer server(80); // Port HTTP par défaut
+
 // Configuration simple
 #define LED_STATUS_PIN 2
 #define SERIAL_BAUD_RATE 115200
