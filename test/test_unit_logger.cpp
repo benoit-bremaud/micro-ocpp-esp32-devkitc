@@ -4,7 +4,6 @@
 
 #include "FileLogger.h"
 
-#include "../features/infra/logging/Logger.h"
 
 #include "../features/infra/logging/log_macros.h" // Pour les macros LOG_DEBUG
 
