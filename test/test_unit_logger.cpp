@@ -2,11 +2,11 @@
 #include <unity.h>
 #include <SPIFFS.h>
 
-#include "FileLogger.cpp"
+#include "FileLogger.h"
 
 // Indique EXPLICITEMENT le chemin correct du Logger.h ET du Logger.cpp
 #include "../features/infra/logging/Logger.h"
-#include "../src/Logger.cpp" // Inclusion directe obligatoire ici
+#include "../features/infra/logging/Logger.h"
 #include "../features/infra/logging/log_macros.h" // Pour les macros LOG_DEBUG
 
 void test_log_history_overflow() {
