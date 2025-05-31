@@ -10,6 +10,11 @@
 #include <FS.h>
 #include <SPIFFS.h>
 
+#include <WebServer.h>
+#include <WiFi.h>
+
+#include "web_log_viewer.h"
+
 #include "Logger.h"
 #include "log_macros.h"
 #include "FileLogger.h"
@@ -22,6 +27,9 @@
 unsigned long lastBlink = 0;
 unsigned long lastHeartbeat = 0;
 bool ledState = false;
+
+const char* ssid = "Benoît";
+const char* password = "26bjsf8b7d7ktg5";
 
 void printLogFile(const char* filename) {
     File file = SPIFFS.open(filename, FILE_READ);
@@ -41,6 +49,20 @@ void setup() {
     // 1. Initialisation série (avant tout le reste)
     Serial.begin(SERIAL_BAUD_RATE);
     delay(2000); // Attendre que le port série soit prêt
+
+    WiFi.begin(ssid, password);
+    Serial.print("Connexion à WiFi");
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+
+    Serial.println("\n✅ WiFi connecté");
+    Serial.print("Adresse IP : ");
+    Serial.println(WiFi.localIP());
+
+    WebLogViewer::setupServer();  // Lance le serveur HTTP
 
     // 2. Initialisation SPIFFS (avant Logger, Web, etc.)
     if (!SPIFFS.begin(true)) {
@@ -98,13 +120,13 @@ void setup() {
     lastBlink = millis();
     lastHeartbeat = millis();
 
-    // 11. (Optionnel) Démarrage du web log viewer si besoin
-    // startWebLogViewer();
 }
 
 
 void loop() {
     unsigned long now = millis();
+
+    WebLogViewer::handleClient();
     
     // Clignotement LED toutes les secondes
     if (now - lastBlink >= 1000) {
